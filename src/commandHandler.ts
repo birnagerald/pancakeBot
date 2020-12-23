@@ -1,0 +1,34 @@
+import { Message } from "discord.js";
+import { Command } from "./commands/command";
+import { CommandContext } from "./commands/commandContext";
+import { PingCommand } from "./commands/ping";
+
+export class CommandHandler {
+  private commands: Command[];
+  private readonly prefix: string;
+
+  constructor(prefix: string) {
+    const commandClasses = [PingCommand];
+
+    this.commands = commandClasses.map((commandClass) => new commandClass());
+    this.prefix = prefix;
+  }
+
+  async handleMessage(message: Message): Promise<void> {
+    if (message.author.bot || !this.isCommand(message)) return;
+    const commandContext = new CommandContext(message, this.prefix);
+
+    const matchedCommands = this.commands.find((command) =>
+      command.commandNames.includes(commandContext.command)
+    );
+
+    if (!matchedCommands) {
+      await message.reply(`Command not found, try ${this.prefix}help`);
+    } else {
+      await matchedCommands.run(commandContext);
+    }
+  }
+  private isCommand(message: Message): boolean {
+    return message.content.startsWith(this.prefix);
+  }
+}
