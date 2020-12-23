@@ -15,7 +15,14 @@ export class CommandHandler {
   }
 
   async handleMessage(message: Message): Promise<void> {
+
+    
+   
     if (message.author.bot || !this.isCommand(message)) return;
+    if (!this.isFromOwner(message)) {
+        await message.reply(`You don't have permissions to execute this command`);
+        return;
+    }
     const commandContext = new CommandContext(message, this.prefix);
 
     const matchedCommands = this.commands.find((command) =>
@@ -30,5 +37,9 @@ export class CommandHandler {
   }
   private isCommand(message: Message): boolean {
     return message.content.startsWith(this.prefix);
+  }
+
+  private isFromOwner(message: Message): boolean {
+    return message.author.id === "119562280974155776";
   }
 }
