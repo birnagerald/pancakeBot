@@ -1,21 +1,22 @@
 import { Client, Message } from "discord.js";
-import { prefix, activity } from "./config.json";
+import { configBot, BotConfig } from "./configBot";
 import { config } from "dotenv";
 config();
 
 export class DiscordBot {
   private client: Client;
-  private config: any;
+  private config: BotConfig;
 
   constructor() {
     this.client = new Client();
+    this.config = configBot;
   }
 
   public start(): void {
     this.client.on("ready", () => {
       console.log("Bot is ready!");
       if (this.client.user) {
-        this.client.user.setActivity(activity);
+        this.client.user.setActivity(this.config.activity);
       }
     });
     this.client.on("error", console.error);
