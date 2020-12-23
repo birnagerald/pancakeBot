@@ -11,10 +11,12 @@
   "author": "Birna Gérald",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.5.1"
+    "discord.js": "^12.5.1",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.14",
+    "@types/node-fetch": "^2.5.7",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.6",
     "typescript": "^4.1.3"
