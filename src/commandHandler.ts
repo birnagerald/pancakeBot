@@ -2,13 +2,15 @@ import { Message } from "discord.js";
 import { Command } from "./commands/command";
 import { CommandContext } from "./commands/commandContext";
 import { PingCommand } from "./commands/ping";
+import { MiyukiCommand } from "./commands/miyuki";
+
 
 export class CommandHandler {
   private commands: Command[];
   private readonly prefix: string;
 
   constructor(prefix: string) {
-    const commandClasses = [PingCommand];
+    const commandClasses = [PingCommand,MiyukiCommand];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
     this.prefix = prefix;
