@@ -5,7 +5,7 @@ export class AnilistRequest {
     url: string,
     variables: any,
     query: string
-  ): Promise<Response> {
+  ){
     let options = {
       method: "POST",
       headers: {
@@ -31,7 +31,7 @@ export class AnilistRequest {
   }
 
   private handleData(data: any): any {
-    console.log(JSON.stringify(data));
+    return data;
   }
 
   private handleError(error: any) {

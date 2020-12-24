@@ -10,7 +10,7 @@ export class CommandHandler {
   private readonly prefix: string;
 
   constructor(prefix: string) {
-    const commandClasses = [PingCommand, MiyukiCommand, GuessAnimeCommand];
+    const commandClasses = [MiyukiCommand, GuessAnimeCommand];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
     this.prefix = prefix;
@@ -18,17 +18,15 @@ export class CommandHandler {
 
   async handleMessage(message: Message): Promise<void> {
     if (message.author.bot || !this.isCommand(message)) return;
-    if (!this.isFromOwner(message)) {
-      await message.reply(`You don't have permissions to execute this command`);
-      return;
-    }
+    // if (!this.isFromOwner(message)) {
+    //   await message.reply(`You don't have permissions to execute this command`);
+    //   return;
+    // }
     const commandContext = new CommandContext(message, this.prefix);
 
     const matchedCommands = this.commands.find((command) =>
       command.commandNames.includes(commandContext.command)
     );
-
-    console.log(commandContext.command);
 
     if (!matchedCommands) {
       await message.reply(`Command not found, try ${this.prefix}help`);
