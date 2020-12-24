@@ -1,11 +1,7 @@
 import fetch, { Response } from "node-fetch";
 
 export class AnilistRequest {
-  public apiCall(
-    url: string,
-    variables: any,
-    query: string
-  ){
+  public apiCall(url: string, variables: any, query: string) {
     let options = {
       method: "POST",
       headers: {
@@ -18,7 +14,6 @@ export class AnilistRequest {
       }),
     };
     // Make the HTTP Api request
-    console.log(url, options);
     return fetch(url, options)
       .then(this.handleResponse)
       .then(this.handleData)

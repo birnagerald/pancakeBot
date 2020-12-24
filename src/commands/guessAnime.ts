@@ -71,12 +71,8 @@ export class GuessAnimeCommand implements Command {
       query
     );
 
-    if (
-      result.data.Page.media[0].coverImage.extraLarge &&
-      result.data.Page.media[0].title.romaji &&
-      result.data.Page.media[0].title.english &&
-      result.data.Page.media[0].title.native
-    ) {
+    if (result.data.Page.media[0].coverImage.extraLarge) {
+      //TODO : ajouter des vérif de récupération des données
       const image: string = result.data.Page.media[0].coverImage.extraLarge;
       const nameRomaji: string = result.data.Page.media[0].title.romaji;
       const nameEnglish: string = result.data.Page.media[0].title.english;
@@ -84,6 +80,16 @@ export class GuessAnimeCommand implements Command {
       const embedWithImage = new MessageEmbed().setImage(image);
 
       const answers = [nameRomaji, nameEnglish, nameNative];
+      if (nameRomaji === null) {
+        let index = answers.indexOf(nameRomaji);
+        answers.splice(index, 1);
+      } else if (nameEnglish === null) {
+        let index = answers.indexOf(nameEnglish);
+        answers.splice(index, 1);
+      } else if (nameNative === null) {
+        let index = answers.indexOf(nameNative);
+        answers.splice(index, 1);
+      }
       console.log(answers);
 
       const filter = (response: { content: string }) => {
@@ -102,15 +108,14 @@ export class GuessAnimeCommand implements Command {
           })
           .catch((collected) => {
             CommandContext.message.channel.send(
-              "Looks like nobody got the answer this time."
+              "Looks like nobody got the answer this time. \nThe answers was : \n" +
+                `${answers[0] != null ? "- " + `${answers[0]}` + "\n" : ""}` +
+                `${answers[1] != null ? "- " + `${answers[1]}` + "\n" : ""}` +
+                `${answers[2] != null ? "- " + `${answers[2]}` + "" : ""}`
             );
           });
       });
     } else {
-      console.log(result.data.Page.media[0].coverImage.extraLarge);
-      console.log(result.data.Page.media[0].title.romaji);
-      console.log(result.data.Page.media[0].title.english);
-      console.log(result.data.Page.media[0].title.native);
       CommandContext.message.reply("Error collecting data please try again");
     }
   }
