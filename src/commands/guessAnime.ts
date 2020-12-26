@@ -145,7 +145,9 @@ export class GuessAnimeCommand implements Command {
 
       const filter = (response: { content: string }) => {
         return answers.some(
-          (answer) => answer.toLowerCase() === response.content.toLowerCase()
+          (answer) =>
+            answer.toLowerCase() === response.content.toLowerCase() ||
+            response.content.toLowerCase() === "pass"
         );
       };
 
@@ -153,9 +155,13 @@ export class GuessAnimeCommand implements Command {
         CommandContext.message.channel
           .awaitMessages(filter, { max: 1, time: 15000, errors: ["time"] })
           .then((collected) => {
-            CommandContext.message.channel.send(
-              `${collected.first()!.author} got the correct answer!`
-            );
+            if (collected.first()!.content === "pass") {
+              CommandContext.message.channel.send(`Canceled`);
+            } else {
+              CommandContext.message.channel.send(
+                `${collected.first()!.author} got the correct answer!`
+              );
+            }
           })
           .catch((collected) => {
             CommandContext.message.channel.send(
