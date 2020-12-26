@@ -4,13 +4,19 @@ import { CommandContext } from "./commands/commandContext";
 import { PingCommand } from "./commands/ping";
 import { MiyukiCommand } from "./commands/miyuki";
 import { GuessAnimeCommand } from "./commands/guessAnime";
+import { HelpCommand } from "./commands/help";
 
 export class CommandHandler {
   private commands: Command[];
   private readonly prefix: string;
 
   constructor(prefix: string) {
-    const commandClasses = [PingCommand, MiyukiCommand, GuessAnimeCommand];
+    const commandClasses = [
+      PingCommand,
+      MiyukiCommand,
+      GuessAnimeCommand,
+      HelpCommand,
+    ];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
     this.prefix = prefix;

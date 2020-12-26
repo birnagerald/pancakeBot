@@ -2,7 +2,7 @@ import { Command } from "./command";
 import { CommandContext } from "./commandContext";
 import { configBot, BotConfig } from "../configBot";
 import { AnilistRequest } from "../utils/AnilistRequest";
-import { Message, MessageCollector, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
 
 export class GuessAnimeCommand implements Command {
   private config: BotConfig;
@@ -151,7 +151,7 @@ export class GuessAnimeCommand implements Command {
 
       CommandContext.message.channel.send(embedWithImage).then(() => {
         CommandContext.message.channel
-          .awaitMessages(filter, { max: 1, time: 2000, errors: ["time"] })
+          .awaitMessages(filter, { max: 1, time: 15000, errors: ["time"] })
           .then((collected) => {
             CommandContext.message.channel.send(
               `${collected.first()!.author} got the correct answer!`
