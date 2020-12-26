@@ -7,6 +7,7 @@ import { Message, MessageCollector, MessageEmbed } from "discord.js";
 export class GuessAnimeCommand implements Command {
   private config: BotConfig;
   private anilistRequest: AnilistRequest;
+  commandActivated: boolean = true;
 
   constructor() {
     this.config = configBot;
@@ -14,7 +15,6 @@ export class GuessAnimeCommand implements Command {
   }
   commandNames: string[] = ["guessanime"];
   async run(CommandContext: CommandContext): Promise<void> {
-    // CommandContext.message.reply("Coming soon!");
 
     let query = `
         query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean) {
@@ -72,7 +72,7 @@ export class GuessAnimeCommand implements Command {
     );
 
     if (result.data.Page.media[0].coverImage.extraLarge) {
-      //TODO : ajouter des vérif de récupération des données
+     
       const image: string = result.data.Page.media[0].coverImage.extraLarge;
       const nameRomaji: string = result.data.Page.media[0].title.romaji;
       const nameEnglish: string = result.data.Page.media[0].title.english;

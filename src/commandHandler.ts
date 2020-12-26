@@ -10,7 +10,7 @@ export class CommandHandler {
   private readonly prefix: string;
 
   constructor(prefix: string) {
-    const commandClasses = [MiyukiCommand, GuessAnimeCommand];
+    const commandClasses = [PingCommand, MiyukiCommand, GuessAnimeCommand];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
     this.prefix = prefix;
@@ -31,7 +31,9 @@ export class CommandHandler {
     if (!matchedCommands) {
       await message.reply(`Command not found, try ${this.prefix}help`);
     } else {
-      await matchedCommands.run(commandContext);
+      this.isActivated(matchedCommands)
+        ? await matchedCommands.run(commandContext)
+        : await message.reply(`This command is disabled for the moment`);
     }
   }
   private isCommand(message: Message): boolean {
@@ -40,5 +42,13 @@ export class CommandHandler {
 
   private isFromOwner(message: Message): boolean {
     return message.author.id === "119562280974155776";
+  }
+
+  private isActivated(command: Command): boolean {
+    if (command.commandActivated === true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -3,6 +3,7 @@ import { CommandContext } from "./commandContext";
 
 export class PingCommand implements Command {
   commandNames: string[] = ["ping"];
+  commandActivated: boolean = false;
   async run(CommandContext: CommandContext): Promise<void> {
     CommandContext.message.reply("pong");
     // CommandContext.message.channel.send(
