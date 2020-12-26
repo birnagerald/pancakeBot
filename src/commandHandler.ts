@@ -23,7 +23,6 @@ export class CommandHandler {
     //   return;
     // }
     const commandContext = new CommandContext(message, this.prefix);
-
     const matchedCommands = this.commands.find((command) =>
       command.commandNames.includes(commandContext.command)
     );

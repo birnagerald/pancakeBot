@@ -7,7 +7,7 @@ export class CommandContext {
   readonly commandPrefix: string;
 
   constructor(message: Message, prefix: string) {
-    const args = message.content.slice(prefix.length).trim().split(/-/g);
+    const args = message.content.slice(prefix.length).trim().split(/ -/g);
 
     this.command = args.shift()!.toLowerCase();
     this.args = args;
