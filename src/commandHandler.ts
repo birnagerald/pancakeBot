@@ -5,6 +5,7 @@ import { PingCommand } from "./commands/ping";
 import { MiyukiCommand } from "./commands/miyuki";
 import { GuessAnimeCommand } from "./commands/guessAnime";
 import { HelpCommand } from "./commands/help";
+import { NhCommand } from "./commands/nh";
 
 export class CommandHandler {
   private commands: Command[];
@@ -16,6 +17,7 @@ export class CommandHandler {
       MiyukiCommand,
       GuessAnimeCommand,
       HelpCommand,
+      NhCommand,
     ];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
