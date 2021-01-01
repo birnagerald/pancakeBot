@@ -17,7 +17,12 @@ export class GuessAnimeCommand implements Command {
   commandNames: string[] = ["guessanime"];
   private checkArgs(CommandContext: CommandContext): boolean {
     if (CommandContext.args[0]) {
-      if (this.Season.includes(CommandContext.args[0])) {
+      if (CommandContext.args[0].split(/ /g).length > 1) {
+        CommandContext.args[0].split(/ /g).map((season) => {
+          if (!this.Season.includes(season)) {
+            return false;
+          }
+        });
         if (CommandContext.args[1]) {
           if (
             Number(CommandContext.args[1]) >= 1940 &&
@@ -40,7 +45,34 @@ export class GuessAnimeCommand implements Command {
         }
         return true;
       } else {
-        return false;
+        if (
+          this.Season.includes(CommandContext.args[0]) ||
+          CommandContext.args[0] === "ALL"
+        ) {
+          if (CommandContext.args[1]) {
+            if (
+              Number(CommandContext.args[1]) >= 1940 &&
+              Number(CommandContext.args[1]) <= new Date().getFullYear()
+            ) {
+              if (CommandContext.args[2]) {
+                if (
+                  CommandContext.args[2] === "true" ||
+                  CommandContext.args[2] === "false"
+                ) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }
+              return true;
+            } else {
+              return false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
       }
     }
     return true;
@@ -50,6 +82,7 @@ export class GuessAnimeCommand implements Command {
       CommandContext.message.reply("Arguments is not valid");
       return;
     }
+
     const defineVariable = (
       page: number = 1,
       season: string = "FALL",
@@ -66,7 +99,8 @@ export class GuessAnimeCommand implements Command {
       return variables;
     };
 
-    let query = `
+    const Query = async (season: string) => {
+      let query = `
         query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean) {
         Page (page: $page, perPage: $perPage) {
             pageInfo {
@@ -92,42 +126,60 @@ export class GuessAnimeCommand implements Command {
     }
        `;
 
-    let result = await this.anilistRequest.apiCall(
-      this.config.apiUrl,
-      defineVariable(
-        1,
-        CommandContext.args[0] ? CommandContext.args[0] : undefined,
-        CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
-        CommandContext.args[2] &&
-          CommandContext.args[2].toLowerCase() === "true"
-          ? Boolean(CommandContext.args[2])
-          : false
-      ),
-      query
-    );
-    let pageMax: number = result.data.Page.pageInfo.lastPage;
+      let result = await this.anilistRequest.apiCall(
+        this.config.apiUrl,
+        defineVariable(
+          1,
+          season ? season : undefined,
+          CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
+          CommandContext.args[2] &&
+            CommandContext.args[2].toLowerCase() === "true"
+            ? Boolean(CommandContext.args[2])
+            : false
+        ),
+        query
+      );
+      let pageMax: number = result.data.Page.pageInfo.lastPage;
 
-    let randomPage: number = Math.floor(Math.random() * pageMax) + 1; // returns a random integer from 1 to pageMax
+      let randomPage: number = Math.floor(Math.random() * pageMax) + 1; // returns a random integer from 1 to pageMax
 
-    result = await this.anilistRequest.apiCall(
-      this.config.apiUrl,
-      defineVariable(
-        randomPage,
-        CommandContext.args[0] ? CommandContext.args[0] : undefined,
-        CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
-        CommandContext.args[2] &&
-          CommandContext.args[2].toLowerCase() === "true"
-          ? Boolean(CommandContext.args[2])
-          : false
-      ),
-      query
-    );
+      result = await this.anilistRequest.apiCall(
+        this.config.apiUrl,
+        defineVariable(
+          randomPage,
+          season ? season : undefined,
+          CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
+          CommandContext.args[2] &&
+            CommandContext.args[2].toLowerCase() === "true"
+            ? Boolean(CommandContext.args[2])
+            : false
+        ),
+        query
+      );
+      return result;
+    };
 
-    if (result.data.Page.media[0].coverImage.extraLarge) {
-      const image: string = result.data.Page.media[0].coverImage.extraLarge;
-      const nameRomaji: string = result.data.Page.media[0].title.romaji;
-      const nameEnglish: string = result.data.Page.media[0].title.english;
-      const nameNative: string = result.data.Page.media[0].title.native;
+    let queryRes;
+
+    if (CommandContext.args[0].split(/ /g).length > 1) {
+      let randomSeason: number = Math.floor(
+        Math.random() * CommandContext.args[0].split(/ /g).length
+      );
+
+      queryRes = await Query(CommandContext.args[0].split(/ /g)[randomSeason]);
+    } else if (CommandContext.args[0] === "ALL") {
+      let randomSeason: number = Math.floor(Math.random() * this.Season.length);
+
+      queryRes = await Query(this.Season[randomSeason]);
+    } else {
+      queryRes = await Query(CommandContext.args[0]);
+    }
+
+    if (queryRes.data.Page.media[0].coverImage.extraLarge) {
+      const image: string = queryRes.data.Page.media[0].coverImage.extraLarge;
+      const nameRomaji: string = queryRes.data.Page.media[0].title.romaji;
+      const nameEnglish: string = queryRes.data.Page.media[0].title.english;
+      const nameNative: string = queryRes.data.Page.media[0].title.native;
       const embedWithImage = new MessageEmbed().setImage(image);
 
       const answers = [nameRomaji, nameEnglish, nameNative];
