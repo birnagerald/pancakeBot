@@ -99,7 +99,7 @@ export class GuessAnimeCommand implements Command {
       return variables;
     };
 
-    const Query = async (season: string) => {
+    const Query = async (season?: string) => {
       let query = `
         query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean) {
         Page (page: $page, perPage: $perPage) {
@@ -121,6 +121,7 @@ export class GuessAnimeCommand implements Command {
             coverImage{
               extraLarge
             }
+            synonyms
         }
         }
     }
@@ -161,18 +162,26 @@ export class GuessAnimeCommand implements Command {
 
     let queryRes;
 
-    if (CommandContext.args[0].split(/ /g).length > 1) {
-      let randomSeason: number = Math.floor(
-        Math.random() * CommandContext.args[0].split(/ /g).length
-      );
+    if (CommandContext.args[0]) {
+      if (CommandContext.args[0].split(/ /g).length > 1) {
+        let randomSeason: number = Math.floor(
+          Math.random() * CommandContext.args[0].split(/ /g).length
+        );
 
-      queryRes = await Query(CommandContext.args[0].split(/ /g)[randomSeason]);
-    } else if (CommandContext.args[0] === "ALL") {
-      let randomSeason: number = Math.floor(Math.random() * this.Season.length);
+        queryRes = await Query(
+          CommandContext.args[0].split(/ /g)[randomSeason]
+        );
+      } else if (CommandContext.args[0] === "ALL") {
+        let randomSeason: number = Math.floor(
+          Math.random() * this.Season.length
+        );
 
-      queryRes = await Query(this.Season[randomSeason]);
-    } else {
-      queryRes = await Query(CommandContext.args[0]);
+        queryRes = await Query(this.Season[randomSeason]);
+      } else {
+        queryRes = await Query(CommandContext.args[0]);
+      }
+    }else{
+      queryRes = await Query();
     }
 
     if (queryRes.data.Page.media[0].coverImage.extraLarge) {
