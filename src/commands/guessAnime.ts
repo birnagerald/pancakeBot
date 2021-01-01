@@ -180,7 +180,7 @@ export class GuessAnimeCommand implements Command {
       } else {
         queryRes = await Query(CommandContext.args[0]);
       }
-    }else{
+    } else {
       queryRes = await Query();
     }
 
@@ -189,9 +189,17 @@ export class GuessAnimeCommand implements Command {
       const nameRomaji: string = queryRes.data.Page.media[0].title.romaji;
       const nameEnglish: string = queryRes.data.Page.media[0].title.english;
       const nameNative: string = queryRes.data.Page.media[0].title.native;
+      const synonyms: string[] = queryRes.data.Page.media[0].synonyms;
       const embedWithImage = new MessageEmbed().setImage(image);
 
       const answers = [nameRomaji, nameEnglish, nameNative];
+
+      if (synonyms.length > 0) {
+        synonyms.map((synonym) => {
+          answers.push(synonym);
+        });
+      }
+
       if (nameRomaji === null) {
         let index = answers.indexOf(nameRomaji);
         answers.splice(index, 1);
