@@ -6,7 +6,7 @@ on:
 jobs:
   job_one:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: debian-latest
     steps:
     - name: deploying application on VPS
       uses: appleboy/ssh-action@master
@@ -16,7 +16,7 @@ jobs:
         key: ${{ secrets.VPS_TOKEN }}
         port: 22
         script: |
-	  ls
+          ls 
           cd kenta_discord/pancakeBot
           git pull
           git fetch
