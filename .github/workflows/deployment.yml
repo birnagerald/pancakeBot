@@ -16,6 +16,7 @@ jobs:
         key: ${{ secrets.VPS_TOKEN }}
         port: 22
         script: |
+	  ls
           cd kenta_discord/pancakeBot
           git pull
           git fetch
