@@ -20,4 +20,5 @@ jobs:
           git pull
           git fetch
           docker build -t pancakebot .
+          docker stop pancakebot && docker rm pancakebot
           docker run -d --name=pancakebot pancakebot
