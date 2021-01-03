@@ -7,7 +7,7 @@ import { MessageEmbed } from "discord.js";
 export class GuessAnimeCommand implements Command {
   private config: BotConfig;
   private anilistRequest: AnilistRequest;
-  commandActivated: boolean = false;
+  commandActivated: boolean = true;
   Season: string[] = ["WINTER", "SPRING", "SUMMER", "FALL"];
 
   constructor() {
