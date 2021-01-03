@@ -1,0 +1,25 @@
+name: Deployment Workflow
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  job_one:
+    name: Deploy
+    runs-on: debian-latest
+    steps:
+    - name: deploying application on VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_TOKEN }}
+        port: 22
+        script: |
+          cd kenta_discord/pancakeBot
+          git pull
+          git fetch
+          docker build -t pancakebot
+          docker run -d --name=pancakebot pancakebot
+
+
