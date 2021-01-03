@@ -16,9 +16,8 @@ jobs:
         key: ${{ secrets.VPS_TOKEN }}
         port: 22
         script: |
-          ls 
           cd kenta_discord/pancakeBot
           git pull
           git fetch
-          docker build -t pancakebot
+          docker build -t pancakebot .
           docker run -d --name=pancakebot pancakebot
