@@ -30,9 +30,6 @@ export class AnilistRequest {
   }
 
   private handleError(error: any) {
-    alert("Error, check console");
     console.error(error);
   }
 }
-// faire une première requète pour trouver le nombre de page total puis en faire une deuxième sur une page random et prendre un anime random sur cette page.
-// Nombre d'anime par page : 50

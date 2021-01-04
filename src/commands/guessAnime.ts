@@ -8,77 +8,82 @@ export class GuessAnimeCommand implements Command {
   private config: BotConfig;
   private anilistRequest: AnilistRequest;
   commandActivated: boolean = true;
-  Season: string[] = ["WINTER", "SPRING", "SUMMER", "FALL"];
+  Season: string[] = ["WINTER", "SPRING", "SUMMER", "FALL", "ALL"];
+  Format: string[] = ["TV", "MOVIE", "OVA"];
 
   constructor() {
     this.config = configBot;
     this.anilistRequest = new AnilistRequest();
   }
   commandNames: string[] = ["guessanime"];
-  private checkArgs(CommandContext: CommandContext): boolean {
+
+  private checkArgsSeason(CommandContext: CommandContext): boolean {
+    let check: boolean = true;
     if (CommandContext.args[0]) {
       if (CommandContext.args[0].split(/ /g).length > 1) {
         CommandContext.args[0].split(/ /g).map((season) => {
-          if (!this.Season.includes(season)) {
-            return false;
+          if (!this.Season.includes(season) || season === "ALL") {
+            check = false;
           }
         });
-        if (CommandContext.args[1]) {
-          if (
-            Number(CommandContext.args[1]) >= 1940 &&
-            Number(CommandContext.args[1]) <= new Date().getFullYear()
-          ) {
-            if (CommandContext.args[2]) {
-              if (
-                CommandContext.args[2] === "true" ||
-                CommandContext.args[2] === "false"
-              ) {
-                return true;
-              } else {
-                return false;
-              }
-            }
-            return true;
-          } else {
-            return false;
+      }
+      if ((CommandContext.args[0].split(/ /g).length = 1)) {
+        CommandContext.args[0].split(/ /g).map((season) => {
+          if (!this.Season.includes(season)) {
+            check = false;
           }
-        }
-        return true;
-      } else {
-        if (
-          this.Season.includes(CommandContext.args[0]) ||
-          CommandContext.args[0] === "ALL"
-        ) {
-          if (CommandContext.args[1]) {
-            if (
-              Number(CommandContext.args[1]) >= 1940 &&
-              Number(CommandContext.args[1]) <= new Date().getFullYear()
-            ) {
-              if (CommandContext.args[2]) {
-                if (
-                  CommandContext.args[2] === "true" ||
-                  CommandContext.args[2] === "false"
-                ) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }
-              return true;
-            } else {
-              return false;
-            }
-          }
-          return true;
-        } else {
-          return false;
-        }
+        });
       }
     }
-    return true;
+    return check;
+  }
+
+  private checkArgsSeasonYear(CommandContext: CommandContext): boolean {
+    let check: boolean = true;
+    if (CommandContext.args[1]) {
+      if (
+        Number(CommandContext.args[1]) < 1940 ||
+        Number(CommandContext.args[1]) > new Date().getFullYear()
+      ) {
+        check = false;
+      }
+    }
+    return check;
+  }
+
+  private checkArgsNsfw(CommandContext: CommandContext): boolean {
+    let check: boolean = true;
+    if (CommandContext.args[2]) {
+      if (
+        CommandContext.args[2] != String("true") &&
+        CommandContext.args[2] != String("false")
+      ) {
+        check = false;
+      }
+    }
+    return check;
+  }
+
+  private checkArgsFormat(CommandContext: CommandContext): boolean {
+    let check: boolean = true;
+    if (CommandContext.args[3]) {
+      if (CommandContext.args[3].split(/ /g).length >= 1) {
+        CommandContext.args[3].split(/ /g).map((format) => {
+          if (!this.Format.includes(format)) {
+            check = false;
+          }
+        });
+      }
+    }
+    return check;
   }
   async run(CommandContext: CommandContext): Promise<void> {
-    if (!this.checkArgs(CommandContext)) {
+    if (
+      !this.checkArgsSeason(CommandContext) ||
+      !this.checkArgsSeasonYear(CommandContext) ||
+      !this.checkArgsNsfw(CommandContext) ||
+      !this.checkArgsFormat(CommandContext)
+    ) {
       CommandContext.message.reply("Arguments is not valid");
       return;
     }
@@ -87,7 +92,8 @@ export class GuessAnimeCommand implements Command {
       page: number = 1,
       season: string = "FALL",
       seasonYear: number = 2020,
-      isAdult: boolean = false
+      isAdult: boolean = false,
+      format: string = "TV"
     ) => {
       let variables = {
         page: page,
@@ -95,13 +101,14 @@ export class GuessAnimeCommand implements Command {
         season: season,
         seasonYear: seasonYear,
         isAdult: isAdult,
+        format: format,
       };
       return variables;
     };
 
     const Query = async (season?: string) => {
       let query = `
-        query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean) {
+        query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean, $format: MediaFormat) {
         Page (page: $page, perPage: $perPage) {
             pageInfo {
             total
@@ -110,7 +117,7 @@ export class GuessAnimeCommand implements Command {
             hasNextPage
             perPage
         }
-        media (type: ANIME, season: $season, seasonYear: $seasonYear, isAdult: $isAdult) {
+        media (type: ANIME, season: $season, seasonYear: $seasonYear, isAdult: $isAdult, format: $format) {
             id
 
             title {
@@ -136,7 +143,8 @@ export class GuessAnimeCommand implements Command {
           CommandContext.args[2] &&
             CommandContext.args[2].toLowerCase() === "true"
             ? Boolean(CommandContext.args[2])
-            : false
+            : false,
+          CommandContext.args[3] ? CommandContext.args[3] : undefined
         ),
         query
       );
@@ -153,7 +161,8 @@ export class GuessAnimeCommand implements Command {
           CommandContext.args[2] &&
             CommandContext.args[2].toLowerCase() === "true"
             ? Boolean(CommandContext.args[2])
-            : false
+            : false,
+          CommandContext.args[3] ? CommandContext.args[3] : undefined
         ),
         query
       );
@@ -173,9 +182,8 @@ export class GuessAnimeCommand implements Command {
         );
       } else if (CommandContext.args[0] === "ALL") {
         let randomSeason: number = Math.floor(
-          Math.random() * this.Season.length
+          Math.random() * (this.Season.length - 1)
         );
-
         queryRes = await Query(this.Season[randomSeason]);
       } else {
         queryRes = await Query(CommandContext.args[0]);
