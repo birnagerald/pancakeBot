@@ -244,13 +244,19 @@ export class GuessAnimeCommand implements Command {
         let propFormated: Prop = JSON.parse(JSON.stringify(prop));
 
         if (nameRomaji) {
-          if (nameRomaji.toLowerCase() === propFormated.name.toLowerCase()) {
-            if (propFormated.aliases.length > 0) {
-              addAliases(propFormated.aliases, answers);
+          if (propFormated.name) {
+            if (nameRomaji.toLowerCase() === propFormated.name.toLowerCase()) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
             }
-          } else if (nameRomaji.toLowerCase() === propFormated.i18n.eng.toLowerCase()) {
-            if (propFormated.aliases.length > 0) {
-              addAliases(propFormated.aliases, answers);
+          } else if (propFormated.i18n.eng) {
+            if (
+              nameRomaji.toLowerCase() === propFormated.i18n.eng.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
             }
           } else if (propFormated.aliases) {
             if (propFormated.aliases.includes(nameRomaji)) {
@@ -258,13 +264,19 @@ export class GuessAnimeCommand implements Command {
             }
           }
         } else if (nameEnglish) {
-          if (nameEnglish.toLowerCase() === propFormated.name.toLowerCase()) {
-            if (propFormated.aliases.length > 0) {
-              addAliases(propFormated.aliases, answers);
+          if (propFormated.name) {
+            if (nameEnglish.toLowerCase() === propFormated.name.toLowerCase()) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
             }
-          } else if (nameEnglish.toLowerCase() === propFormated.i18n.eng.toLowerCase()) {
-            if (propFormated.aliases.length > 0) {
-              addAliases(propFormated.aliases, answers);
+          } else if (propFormated.i18n.eng) {
+            if (
+              nameEnglish.toLowerCase() === propFormated.i18n.eng.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
             }
           } else if (propFormated.aliases) {
             if (propFormated.aliases.includes(nameEnglish)) {
