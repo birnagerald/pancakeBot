@@ -336,7 +336,7 @@ export class GuessAnimeCommand implements Command {
           })
           .catch((collected) => {
             CommandContext.message.channel.send(
-              "Looks like nobody got the answer this time. \nThe answers was : \n" +
+              "Looks like nobody got the answer this time. \nAnswers were : \n" +
                 `${answers[0] != null ? "- " + `${answers[0]}` + "\n" : ""}` +
                 `${answers[1] != null ? "- " + `${answers[1]}` + "\n" : ""}` +
                 `${answers[2] != null ? "- " + `${answers[2]}` + "\n" : ""}` +
