@@ -2,11 +2,32 @@ import { Command } from "./command";
 import { CommandContext } from "./commandContext";
 import { configBot, BotConfig } from "../configBot";
 import { AnilistRequest } from "../utils/AnilistRequest";
+import { KmRequest } from "../utils/KmRequest";
 import { MessageEmbed } from "discord.js";
+
+interface Prop {
+  tid: string;
+  types: Array<number>;
+  name: string;
+  short: any;
+  aliases: Array<string>;
+  i18n: {
+    eng: string;
+    jpn: string;
+  };
+  karacount: object;
+  tagfile: string;
+  count: number;
+  problematic: boolean;
+  nolivedownload: boolean;
+  repository: string;
+  modified_at: Date;
+}
 
 export class GuessAnimeCommand implements Command {
   private config: BotConfig;
   private anilistRequest: AnilistRequest;
+  private kmRequest: KmRequest;
   commandActivated: boolean = true;
   Season: string[] = ["WINTER", "SPRING", "SUMMER", "FALL", "ALL"];
   Format: string[] = ["TV", "MOVIE", "OVA"];
@@ -14,6 +35,7 @@ export class GuessAnimeCommand implements Command {
   constructor() {
     this.config = configBot;
     this.anilistRequest = new AnilistRequest();
+    this.kmRequest = new KmRequest();
   }
   commandNames: string[] = ["guessanime"];
 
@@ -192,6 +214,14 @@ export class GuessAnimeCommand implements Command {
       queryRes = await Query();
     }
 
+    const addAliases = (aliases: Array<string>, answers: Array<string>) => {
+      aliases.map((aliase) => {
+        if (!answers.includes(aliase)) {
+          answers.push(aliase);
+        }
+      });
+    };
+
     if (queryRes.data.Page.media[0].coverImage.extraLarge) {
       const image: string = queryRes.data.Page.media[0].coverImage.extraLarge;
       const nameRomaji: string = queryRes.data.Page.media[0].title.romaji;
@@ -201,6 +231,58 @@ export class GuessAnimeCommand implements Command {
       const embedWithImage = new MessageEmbed().setImage(image);
 
       const answers = [nameRomaji, nameEnglish, nameNative];
+
+      const KMREQUEST = await this.kmRequest.apiCall(
+        "https://kara.moe/api/karas/tags/1?from=0&size=5000&order=karacount&stripEmpty=true"
+      );
+      if (KMREQUEST.error) {
+        console.log(console.error(KMREQUEST.error));
+        return;
+      }
+
+      KMREQUEST.content.map((prop) => {
+        let propFormated: Prop = JSON.parse(JSON.stringify(prop));
+
+        if (nameRomaji) {
+          if (nameRomaji === propFormated.name) {
+            if (propFormated.aliases.length > 0) {
+              addAliases(propFormated.aliases, answers);
+            }
+          } else if (nameRomaji === propFormated.i18n.eng) {
+            if (propFormated.aliases.length > 0) {
+              addAliases(propFormated.aliases, answers);
+            }
+          } else if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameRomaji)) {
+              addAliases(propFormated.aliases, answers);
+            }
+          }
+        } else if (nameEnglish) {
+          if (nameEnglish === propFormated.name) {
+            if (propFormated.aliases.length > 0) {
+              addAliases(propFormated.aliases, answers);
+            }
+          } else if (nameEnglish === propFormated.i18n.eng) {
+            if (propFormated.aliases.length > 0) {
+              addAliases(propFormated.aliases, answers);
+            }
+          } else if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameEnglish)) {
+              addAliases(propFormated.aliases, answers);
+            }
+          }
+        } else if (nameNative) {
+          if (nameNative === propFormated.i18n.jpn) {
+            if (propFormated.aliases.length > 0) {
+              addAliases(propFormated.aliases, answers);
+            }
+          } else if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameNative)) {
+              addAliases(propFormated.aliases, answers);
+            }
+          }
+        }
+      });
 
       if (synonyms.length > 0) {
         synonyms.map((synonym) => {
@@ -245,7 +327,15 @@ export class GuessAnimeCommand implements Command {
               "Looks like nobody got the answer this time. \nThe answers was : \n" +
                 `${answers[0] != null ? "- " + `${answers[0]}` + "\n" : ""}` +
                 `${answers[1] != null ? "- " + `${answers[1]}` + "\n" : ""}` +
-                `${answers[2] != null ? "- " + `${answers[2]}` + "" : ""}`
+                `${answers[2] != null ? "- " + `${answers[2]}` + "\n" : ""}` +
+                `${answers[3] != null ? "- " + `${answers[3]}` + "\n" : ""}` +
+                `${answers[4] != null ? "- " + `${answers[4]}` + "\n" : ""}` +
+                `${answers[5] != null ? "- " + `${answers[5]}` + "\n" : ""}` +
+                `${answers[6] != null ? "- " + `${answers[6]}` + "\n" : ""}` +
+                `${answers[7] != null ? "- " + `${answers[7]}` + "\n" : ""}` +
+                `${answers[8] != null ? "- " + `${answers[8]}` + "\n" : ""}` +
+                `${answers[9] != null ? "- " + `${answers[9]}` + "\n" : ""}` +
+                `${answers[10] != null ? "- " + `${answers[10]}` + "" : ""}`
             );
           });
       });
