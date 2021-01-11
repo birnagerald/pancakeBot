@@ -244,11 +244,11 @@ export class GuessAnimeCommand implements Command {
         let propFormated: Prop = JSON.parse(JSON.stringify(prop));
 
         if (nameRomaji) {
-          if (nameRomaji === propFormated.name) {
+          if (nameRomaji.toLowerCase() === propFormated.name.toLowerCase()) {
             if (propFormated.aliases.length > 0) {
               addAliases(propFormated.aliases, answers);
             }
-          } else if (nameRomaji === propFormated.i18n.eng) {
+          } else if (nameRomaji.toLowerCase() === propFormated.i18n.eng.toLowerCase()) {
             if (propFormated.aliases.length > 0) {
               addAliases(propFormated.aliases, answers);
             }
@@ -258,11 +258,11 @@ export class GuessAnimeCommand implements Command {
             }
           }
         } else if (nameEnglish) {
-          if (nameEnglish === propFormated.name) {
+          if (nameEnglish.toLowerCase() === propFormated.name.toLowerCase()) {
             if (propFormated.aliases.length > 0) {
               addAliases(propFormated.aliases, answers);
             }
-          } else if (nameEnglish === propFormated.i18n.eng) {
+          } else if (nameEnglish.toLowerCase() === propFormated.i18n.eng.toLowerCase()) {
             if (propFormated.aliases.length > 0) {
               addAliases(propFormated.aliases, answers);
             }
