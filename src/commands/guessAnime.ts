@@ -222,6 +222,24 @@ export class GuessAnimeCommand implements Command {
       });
     };
 
+    const addEnglishName = (engName: string, answers: Array<string>) => {
+      if (!answers.includes(engName)) {
+        answers.push(engName);
+      }
+    };
+
+    const addJpnName = (jpnName: string, answers: Array<string>) => {
+      if (!answers.includes(jpnName)) {
+        answers.push(jpnName);
+      }
+    };
+
+    const addName = (name: string, answers: Array<string>) => {
+      if (!answers.includes(name)) {
+        answers.push(name);
+      }
+    };
+
     if (queryRes.data.Page.media[0].coverImage.extraLarge) {
       const image: string = queryRes.data.Page.media[0].coverImage.extraLarge;
       const nameRomaji: string = queryRes.data.Page.media[0].title.romaji;
@@ -231,70 +249,6 @@ export class GuessAnimeCommand implements Command {
       const embedWithImage = new MessageEmbed().setImage(image);
 
       const answers = [nameRomaji, nameEnglish, nameNative];
-
-      const KMREQUEST = await this.kmRequest.apiCall(
-        "https://kara.moe/api/karas/tags/1?from=0&size=5000&order=karacount&stripEmpty=true"
-      );
-      if (KMREQUEST.error) {
-        console.log(console.error(KMREQUEST.error));
-        return;
-      }
-
-      KMREQUEST.content.map((prop) => {
-        let propFormated: Prop = JSON.parse(JSON.stringify(prop));
-
-        if (nameRomaji) {
-          if (propFormated.name) {
-            if (nameRomaji.toLowerCase() === propFormated.name.toLowerCase()) {
-              if (propFormated.aliases.length > 0) {
-                addAliases(propFormated.aliases, answers);
-              }
-            }
-          } else if (propFormated.i18n.eng) {
-            if (
-              nameRomaji.toLowerCase() === propFormated.i18n.eng.toLowerCase()
-            ) {
-              if (propFormated.aliases.length > 0) {
-                addAliases(propFormated.aliases, answers);
-              }
-            }
-          } else if (propFormated.aliases) {
-            if (propFormated.aliases.includes(nameRomaji)) {
-              addAliases(propFormated.aliases, answers);
-            }
-          }
-        } else if (nameEnglish) {
-          if (propFormated.name) {
-            if (nameEnglish.toLowerCase() === propFormated.name.toLowerCase()) {
-              if (propFormated.aliases.length > 0) {
-                addAliases(propFormated.aliases, answers);
-              }
-            }
-          } else if (propFormated.i18n.eng) {
-            if (
-              nameEnglish.toLowerCase() === propFormated.i18n.eng.toLowerCase()
-            ) {
-              if (propFormated.aliases.length > 0) {
-                addAliases(propFormated.aliases, answers);
-              }
-            }
-          } else if (propFormated.aliases) {
-            if (propFormated.aliases.includes(nameEnglish)) {
-              addAliases(propFormated.aliases, answers);
-            }
-          }
-        } else if (nameNative) {
-          if (nameNative === propFormated.i18n.jpn) {
-            if (propFormated.aliases.length > 0) {
-              addAliases(propFormated.aliases, answers);
-            }
-          } else if (propFormated.aliases) {
-            if (propFormated.aliases.includes(nameNative)) {
-              addAliases(propFormated.aliases, answers);
-            }
-          }
-        }
-      });
 
       if (synonyms.length > 0) {
         synonyms.map((synonym) => {
@@ -312,6 +266,202 @@ export class GuessAnimeCommand implements Command {
         let index = answers.indexOf(nameNative);
         answers.splice(index, 1);
       }
+
+      const KMREQUEST = await this.kmRequest.apiCall(
+        "https://kara.moe/api/karas/tags/1?from=0&size=5000&order=karacount&stripEmpty=true"
+      );
+      if (KMREQUEST.error) {
+        console.log(console.error(KMREQUEST.error));
+        return;
+      }
+
+      const Prop = JSON.parse(JSON.stringify(KMREQUEST.content));
+
+      Prop.map((propFormated: Prop) => {
+        if (nameRomaji) {
+          if (propFormated.name) {
+            if (nameRomaji.toLowerCase() === propFormated.name.toLowerCase()) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.eng) {
+            if (
+              nameRomaji.toLowerCase() === propFormated.i18n.eng.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.jpn) {
+            if (
+              nameRomaji.toLowerCase() === propFormated.i18n.jpn.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+            }
+          }
+          if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameRomaji)) {
+              addAliases(propFormated.aliases, answers);
+
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+        }
+
+        if (nameEnglish) {
+          if (propFormated.name) {
+            if (nameEnglish.toLowerCase() === propFormated.name.toLowerCase()) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.eng) {
+            if (
+              nameEnglish.toLowerCase() === propFormated.i18n.eng.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.jpn) {
+            if (
+              nameEnglish.toLowerCase() === propFormated.i18n.jpn.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+            }
+          }
+          if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameEnglish)) {
+              addAliases(propFormated.aliases, answers);
+
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+        }
+
+        if (nameNative) {
+          if (propFormated.name) {
+            if (nameNative.toLowerCase() === propFormated.name.toLowerCase()) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.eng) {
+            if (
+              nameNative.toLowerCase() === propFormated.i18n.eng.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+          if (propFormated.i18n.jpn) {
+            if (
+              nameNative.toLowerCase() === propFormated.i18n.jpn.toLowerCase()
+            ) {
+              if (propFormated.aliases.length > 0) {
+                addAliases(propFormated.aliases, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+            }
+          }
+          if (propFormated.aliases) {
+            if (propFormated.aliases.includes(nameNative)) {
+              addAliases(propFormated.aliases, answers);
+
+              if (propFormated.i18n.eng) {
+                addEnglishName(propFormated.i18n.eng, answers);
+              }
+              if (propFormated.i18n.jpn) {
+                addJpnName(propFormated.i18n.jpn, answers);
+              }
+              if (propFormated.name) {
+                addName(propFormated.name, answers);
+              }
+            }
+          }
+        }
+      });
+
       console.log(answers);
 
       const filter = (response: { content: string }) => {
