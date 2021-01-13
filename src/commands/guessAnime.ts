@@ -115,7 +115,8 @@ export class GuessAnimeCommand implements Command {
       season: string = "FALL",
       seasonYear: number = 2020,
       isAdult: boolean = false,
-      format: string = "TV"
+      format: string = "TV",
+      popularityRatio: number = 3000
     ) => {
       let variables = {
         page: page,
@@ -124,13 +125,14 @@ export class GuessAnimeCommand implements Command {
         seasonYear: seasonYear,
         isAdult: isAdult,
         format: format,
+        popularityRatio: popularityRatio,
       };
       return variables;
     };
 
     const Query = async (season?: string) => {
       let query = `
-        query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean, $format: MediaFormat) {
+        query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean, $format: MediaFormat, $popularityRatio: Int) {
         Page (page: $page, perPage: $perPage) {
             pageInfo {
             total
@@ -139,7 +141,7 @@ export class GuessAnimeCommand implements Command {
             hasNextPage
             perPage
         }
-        media (type: ANIME, season: $season, seasonYear: $seasonYear, isAdult: $isAdult, format: $format) {
+        media (type: ANIME, season: $season, seasonYear: $seasonYear, isAdult: $isAdult, format: $format, popularity_greater: $popularityRatio) {
             id
 
             title {
