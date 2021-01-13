@@ -168,7 +168,8 @@ export class GuessAnimeCommand implements Command {
             CommandContext.args[2].toLowerCase() === "true"
             ? Boolean(CommandContext.args[2])
             : false,
-          CommandContext.args[3] ? CommandContext.args[3] : undefined
+          CommandContext.args[3] ? CommandContext.args[3] : undefined,
+          CommandContext.args[2].toLowerCase() === "true" ? 1 : 3000
         ),
         query
       );
@@ -186,7 +187,8 @@ export class GuessAnimeCommand implements Command {
             CommandContext.args[2].toLowerCase() === "true"
             ? Boolean(CommandContext.args[2])
             : false,
-          CommandContext.args[3] ? CommandContext.args[3] : undefined
+          CommandContext.args[3] ? CommandContext.args[3] : undefined,
+          CommandContext.args[2].toLowerCase() === "true" ? 1 : 3000
         ),
         query
       );
