@@ -164,12 +164,17 @@ export class GuessAnimeCommand implements Command {
           1,
           season ? season : undefined,
           CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
-          CommandContext.args[2] &&
-            CommandContext.args[2].toLowerCase() === "true"
-            ? Boolean(CommandContext.args[2])
+          CommandContext.args[2]
+            ? CommandContext.args[2].toLowerCase() === "true"
+              ? Boolean(CommandContext.args[2])
+              : false
             : false,
           CommandContext.args[3] ? CommandContext.args[3] : undefined,
-          CommandContext.args[2].toLowerCase() === "true" ? 1 : 3000
+          CommandContext.args[2]
+            ? CommandContext.args[2].toLowerCase() === "true"
+              ? 1
+              : 3000
+            : 3000
         ),
         query
       );
@@ -183,12 +188,11 @@ export class GuessAnimeCommand implements Command {
           randomPage,
           season ? season : undefined,
           CommandContext.args[1] ? Number(CommandContext.args[1]) : undefined,
-          CommandContext.args[2] &&
-            CommandContext.args[2].toLowerCase() === "true"
+          CommandContext.args[2] && CommandContext.args[2] === "true"
             ? Boolean(CommandContext.args[2])
             : false,
           CommandContext.args[3] ? CommandContext.args[3] : undefined,
-          CommandContext.args[2].toLowerCase() === "true" ? 1 : 3000
+          CommandContext.args[2] === "true" ? 1 : 3000
         ),
         query
       );
