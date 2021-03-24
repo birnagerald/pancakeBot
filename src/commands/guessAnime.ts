@@ -15,13 +15,7 @@ interface Prop {
     eng: string;
     jpn: string;
   };
-  karacount: object;
-  tagfile: string;
-  count: number;
-  problematic: boolean;
-  nolivedownload: boolean;
-  repository: string;
-  modified_at: Date;
+
 }
 
 export class GuessAnimeCommand implements Command {
@@ -100,6 +94,7 @@ export class GuessAnimeCommand implements Command {
     return check;
   }
   async run(CommandContext: CommandContext): Promise<void> {
+    
     if (
       !this.checkArgsSeason(CommandContext) ||
       !this.checkArgsSeasonYear(CommandContext) ||
@@ -113,7 +108,7 @@ export class GuessAnimeCommand implements Command {
     const defineVariable = (
       page: number = 1,
       season: string = "FALL",
-      seasonYear: number = 2020,
+      seasonYear: number = 2021,
       isAdult: boolean = false,
       format: string = "TV",
       popularityRatio: number = 3000
