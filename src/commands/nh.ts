@@ -11,6 +11,7 @@ const api = new API();
 export class NhCommand implements Command {
   commandNames: string[] = ["nh"];
   commandActivated: boolean = true;
+  commandAdmin: boolean = false;
 
   private checkArgs(CommandContext: CommandContext): boolean {
     if (CommandContext.args[0]) {

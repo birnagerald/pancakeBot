@@ -11,15 +11,15 @@
   "author": "Birna Gérald",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.5.1",
+    "discord.js": "^12.5.3",
     "nhentai-api": "^3.0.2",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "@types/node": "^14.14.14",
-    "@types/node-fetch": "^2.5.7",
+    "@types/node": "^14.14.37",
+    "@types/node-fetch": "^2.5.9",
     "dotenv": "^8.2.0",
-    "nodemon": "^2.0.6",
-    "typescript": "^4.1.3"
+    "nodemon": "^2.0.7",
+    "typescript": "^4.2.3"
   }
 }

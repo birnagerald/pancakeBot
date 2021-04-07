@@ -23,6 +23,7 @@ export class GuessAnimeCommand implements Command {
   private anilistRequest: AnilistRequest;
   private kmRequest: KmRequest;
   commandActivated: boolean = true;
+  commandAdmin: boolean = false;
   Season: string[] = ["WINTER", "SPRING", "SUMMER", "FALL", "ALL"];
   Format: string[] = ["TV", "MOVIE", "OVA"];
 
