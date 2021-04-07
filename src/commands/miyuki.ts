@@ -5,6 +5,7 @@ import { Client } from "discord.js";
 export class MiyukiCommand implements Command {
   private client: Client;
   commandActivated: boolean = true;
+  commandAdmin: boolean = true;
   constructor() {
     this.client = new Client();
   }

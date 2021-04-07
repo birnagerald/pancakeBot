@@ -6,6 +6,7 @@ import { MiyukiCommand } from "./commands/miyuki";
 import { GuessAnimeCommand } from "./commands/guessAnime";
 import { HelpCommand } from "./commands/help";
 import { NhCommand } from "./commands/nh";
+import { GetPlayersCommand } from "./commands/getPlayers";
 
 export class CommandHandler {
   private commands: Command[];
@@ -18,6 +19,7 @@ export class CommandHandler {
       GuessAnimeCommand,
       HelpCommand,
       NhCommand,
+      GetPlayersCommand,
     ];
 
     this.commands = commandClasses.map((commandClass) => new commandClass());
@@ -37,6 +39,12 @@ export class CommandHandler {
 
     if (!matchedCommands) {
       await message.reply(`Command not found, try ${this.prefix}help`);
+    } else if (this.isAdmin(matchedCommands)) {
+      this.isFromOwner(message)
+        ? await matchedCommands.run(commandContext)
+        : await message.reply(
+            `You don't have permission to execute this command`
+          );
     } else {
       this.isActivated(matchedCommands)
         ? await matchedCommands.run(commandContext)
@@ -49,6 +57,14 @@ export class CommandHandler {
 
   private isFromOwner(message: Message): boolean {
     return message.author.id === "119562280974155776";
+  }
+
+  private isAdmin(command: Command): boolean {
+    if (command.commandAdmin === true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private isActivated(command: Command): boolean {
